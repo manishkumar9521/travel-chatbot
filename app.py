@@ -18,7 +18,10 @@ model = init_chat_model(
     model_provider="openai"
 )
 
-from langchain.schema import HumanMessage
-response = model.invoke([HumanMessage(content="Hi, how are you?")])
+from langchain.schema import HumanMessage, SystemMessage
+response = model.invoke([
+    SystemMessage(content="You are a helpful, friendly travel assistant."),
+    HumanMessage(content="Hi, how are you?")
+])
 
 print(response.content)
