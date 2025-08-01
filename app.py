@@ -12,12 +12,16 @@ else:
 
 from langchain.chat_models import init_chat_model
 
+# model="llama3.2", model_provider="ollama"
 model = init_chat_model(
     temperature=0.7,
     model="deepseek/deepseek-chat-v3-0324:free",
     model_provider="openai",
-    max_tokens=500
+    max_tokens=50
 )
+
+from tools_functions import get_weather, get_population
+model.bind_tools([get_weather, get_population])
 
 from langchain.schema import HumanMessage, SystemMessage
 system_prompt = SystemMessage(
@@ -43,7 +47,8 @@ def chat_with_bot(query, chat_history):
         chunks = []
         for chunk in model.stream(messages):
             chunks.append(chunk.content or "")  # Avoid NoneType issues
-            if getattr(chunk, "response_metadata", {}).get("finish_reason") == "stop" and is_streaming:
+            meta = getattr(chunk, "response_metadata", {})
+            if (meta.get("finish_reason") == "stop" or meta.get("done") is True) and is_streaming:
                 is_streaming = False
             yield "".join(chunks) + (loading_html if is_streaming else "")
 

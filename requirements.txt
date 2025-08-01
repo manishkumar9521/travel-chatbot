@@ -2,3 +2,7 @@ python-dotenv
 langchain
 langchain-deepseek
 gradio
+
+langchain-ollama    #ollama model with init_chat_model function
+langchain_huggingface
+numexpr #for LLMMathChain

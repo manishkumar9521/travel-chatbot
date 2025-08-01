@@ -5,7 +5,7 @@ loading_html = """
 <style>
 @keyframes dotFlashing {
   0% { background-color: #2e8be8; }
-  80%, 100% { background-color: rgba(46,139,232,0.2); }
+  50%, 100% { background-color: rgba(46,139,232,0.2); }
 }
 .dot-flashing {
   width: 10px;
@@ -13,7 +13,7 @@ loading_html = """
   border-radius: 5px;
   background-color: #2e8be8;
   color: #2e8be8;
-  animation: dotFlashing 0.5s infinite linear alternate;
+  animation: dotFlashing 1s infinite linear alternate;
   display: inline-block;
 }
 </style>
