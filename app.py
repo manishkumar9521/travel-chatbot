@@ -15,12 +15,13 @@ from langchain.chat_models import init_chat_model
 model = init_chat_model(
     temperature=0.7,
     model="deepseek/deepseek-chat-v3-0324:free",
-    model_provider="openai"
+    model_provider="openai",
+    max_tokens=500
 )
 
 from langchain.schema import HumanMessage, SystemMessage
 system_prompt = SystemMessage(
-    content="You are a helpful, friendly travel assistant and who in a short, concise and accurate manner. " \
+    content="You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
     "You also creates travel packages for the users. If you don't know the answer just say it.")
 
 from html_design import loading_html
