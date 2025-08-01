@@ -22,44 +22,45 @@ from langchain.schema import HumanMessage, SystemMessage
 system_prompt = SystemMessage(content="You are a helpful, friendly travel assistant.")
 
 # Define chatbot function
+from openai import RateLimitError
 def chat_with_bot(user_input, chat_history):
     messages = [system_prompt]
-    
+
     # Add history (if any)
-    for human, ai in chat_history:
-        messages.append(HumanMessage(content=human))
-        messages.append(HumanMessage(content=ai))  # Gradio doesn't track AIMessage; reuse HumanMessage
+    for message in chat_history:
+        if message["role"] == "user":
+           messages.append(HumanMessage(content=message['content']))
+        else:
+           messages.append(SystemMessage(content=message['content']))
     
-    # Add current input
+    # # Add current input
     messages.append(HumanMessage(content=user_input))
     
-    # Get model response
-    response = model.invoke(messages)
+    # # Get model response
+    try:
+        response = model.invoke(messages)
+    except RateLimitError as e:
+        # Friendly message for user
+        return e.message
     
-    chat_history.append((user_input, response.content))
-    return chat_history, chat_history
+    except Exception as e:
+        # General fallback in case of other errors
+        return f"⚠️ An unexpected error occurred: {str(e)}"
+    
+    return response.content
 
 import gradio as gr
-with gr.Blocks() as demo:
-    gr.Markdown("## 🧳 Travel Assistant Chatbot (LangChain + OpenRouter + Gradio)")
-    chatbot = gr.Chatbot()
-    msg = gr.Textbox(label="Type your message here...")
-    clear = gr.Button("Clear")
-
-    state = gr.State([])
-
-    msg.submit(
-        chat_with_bot,
-        [msg, state],
-        [chatbot, state]
-    )
-
-    clear.click(
-        lambda: ([], []),
-        None,
-        [chatbot, state]
-    )
-
-demo.launch()
-
-print(response.content)
+with gr.ChatInterface(
+    chat_with_bot,
+    type="messages",
+    textbox=gr.Textbox(
+        placeholder="Ask me a yes or no question",
+        container=False,
+        scale=7
+    ),
+    title="🧳 Travel Assistant Chatbot (LangChain + OpenRouter + Gradio)",
+    description="Ask any question about the place where you want to visit.",
+    theme="ocean",
+    examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
+) as demo:
+    demo.launch()
