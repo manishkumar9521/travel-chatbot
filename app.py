@@ -19,7 +19,9 @@ model = init_chat_model(
 )
 
 from langchain.schema import HumanMessage, SystemMessage
-system_prompt = SystemMessage(content="You are a helpful, friendly travel assistant.")
+system_prompt = SystemMessage(
+    content="You are a helpful, friendly travel assistant and who in a short, concise and accurate manner. " \
+    "You also creates travel packages for the users. If you don't know the answer just say it.")
 
 # Define chatbot function
 from openai import RateLimitError
@@ -61,6 +63,6 @@ with gr.ChatInterface(
     title="🧳 Travel Assistant Chatbot (LangChain + OpenRouter + Gradio)",
     description="Ask any question about the place where you want to visit.",
     theme="ocean",
-    examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
+    examples=["Hello", "Plan a trip", "Suggest me a picnic location near me"],
 ) as demo:
     demo.launch()
