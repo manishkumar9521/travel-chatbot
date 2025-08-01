@@ -23,6 +23,7 @@ system_prompt = SystemMessage(
     content="You are a helpful, friendly travel assistant and who in a short, concise and accurate manner. " \
     "You also creates travel packages for the users. If you don't know the answer just say it.")
 
+from html_design import loading_html
 # Define chatbot function
 from openai import RateLimitError
 def chat_with_bot(query, chat_history):
@@ -37,16 +38,21 @@ def chat_with_bot(query, chat_history):
     
     # # Get model response
     try:
-        response = model.invoke(messages)
+        is_streaming = True
+        chunks = []
+        for chunk in model.stream(messages):
+            chunks.append(chunk.content or "")  # Avoid NoneType issues
+            if getattr(chunk, "response_metadata", {}).get("finish_reason") == "stop" and is_streaming:
+                is_streaming = False
+            yield "".join(chunks) + (loading_html if is_streaming else "")
+
     except RateLimitError as e:
         # Friendly message for user
-        return e.message
+        yield e.message
     
     except Exception as e:
         # General fallback in case of other errors
-        return f"⚠️ An unexpected error occurred: {str(e)}"
-    
-    return response.content
+        yield f"⚠️ An unexpected error occurred: {str(e)}"
 
 import gradio as gr
 demo = gr.ChatInterface(
