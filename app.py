@@ -25,18 +25,15 @@ system_prompt = SystemMessage(
 
 # Define chatbot function
 from openai import RateLimitError
-def chat_with_bot(user_input, chat_history):
+def chat_with_bot(query, chat_history):
     messages = [system_prompt]
 
     # Add history (if any)
-    for message in chat_history:
-        if message["role"] == "user":
-           messages.append(HumanMessage(content=message['content']))
-        else:
-           messages.append(SystemMessage(content=message['content']))
-    
+    for msg in chat_history:
+        messages.append((HumanMessage if msg["role"] == "user" else SystemMessage)(content=msg["content"]))
+
     # # Add current input
-    messages.append(HumanMessage(content=user_input))
+    messages.append(HumanMessage(content=query))
     
     # # Get model response
     try:
@@ -52,8 +49,8 @@ def chat_with_bot(user_input, chat_history):
     return response.content
 
 import gradio as gr
-with gr.ChatInterface(
-    chat_with_bot,
+demo = gr.ChatInterface(
+    fn=chat_with_bot,
     type="messages",
     textbox=gr.Textbox(
         placeholder="Ask me a yes or no question",
@@ -64,5 +61,5 @@ with gr.ChatInterface(
     description="Ask any question about the place where you want to visit.",
     theme="ocean",
     examples=["Hello", "Plan a trip", "Suggest me a picnic location near me"],
-) as demo:
-    demo.launch()
+)
+demo.launch()
