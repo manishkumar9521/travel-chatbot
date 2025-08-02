@@ -20,7 +20,7 @@ model = init_chat_model(
     max_tokens=50
 )
 
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 system_prompt = SystemMessage(
     content="You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
     "You also creates travel packages for the users. If needed you uses tools to answer questions and "
@@ -34,7 +34,7 @@ def chat_with_bot(query, chat_history):
 
     # Add history (if any)
     for msg in chat_history:
-        messages.append((HumanMessage if msg["role"] == "user" else SystemMessage)(content=msg["content"]))
+        messages.append((HumanMessage if msg["role"] == "user" else AIMessage)(content=msg["content"]))
 
     # # Add current input
     messages.append(HumanMessage(content=query))
