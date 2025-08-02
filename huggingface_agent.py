@@ -43,9 +43,13 @@ weather_tool = Tool(
 
 tools = [calculator_tool, weather_tool]
 
+system_prompt = "You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
+    "You also creates travel packages for the users. If needed you uses tools to answer questions and "\
+    "if you don't know the answer just say it. Don't say I don't have tools just answer in general way."
+
 # 4. Create the prompt for the agent
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant, if needed you uses tools to answer questions. If you don't knows the answer then say so."),
+    ("system", system_prompt),
     MessagesPlaceholder("chat_history", optional=True),
     ("human", "{input}"),
     MessagesPlaceholder("agent_scratchpad"),
@@ -58,23 +62,13 @@ agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # 6. Use the agent
-# print(agent_executor.invoke({"input": "What is 100 divided by 5 plus 2?"}))
-# print(agent_executor.invoke({"input": "What is the weather like in Paris?"}))
-# print(agent_executor.invoke({"input": "How far is Meerut from Delhi?"}))
-
-
-
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
-system_prompt = SystemMessage(
-    content="You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
-    "You also creates travel packages for the users. If needed you uses tools to answer questions and "
-    "if you don't know the answer just say it. Don't say I don't have tools just answer in general way.")
-
+from langchain.schema import HumanMessage, AIMessage
 from html_design import loading_html
+
 # Define chatbot function
 from openai import RateLimitError
 def chat_with_bot(query, chat_history):
-    messages = [system_prompt]
+    messages = []
 
     # Add history (if any)
     for msg in chat_history:
@@ -121,6 +115,6 @@ demo = gr.ChatInterface(
     title="🧳 Travel Assistant Chatbot (LangChain + Agent Tools + Gradio)",
     description="Ask any question about the place where you want to visit.<br>Note: The weather tool, powered by Agentic AI, always reports 'very cold' with a temperature of 49°C.",
     theme="ocean",
-    examples=["Hello", "How is the weather in Meerut?", "Suggest me a picnic location near me"],
+    examples=["Hello", "How is the weather in Meerut?", "Suggest me a picnic location near me", "What is 100 divided by 5 plus 2?"],
 )
 demo.launch()
