@@ -20,13 +20,11 @@ model = init_chat_model(
     max_tokens=50
 )
 
-from tools_functions import get_weather, get_population
-model.bind_tools([get_weather, get_population])
-
 from langchain.schema import HumanMessage, SystemMessage
 system_prompt = SystemMessage(
     content="You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
-    "You also creates travel packages for the users. If you don't know the answer just say it.")
+    "You also creates travel packages for the users. If needed you uses tools to answer questions and "
+    "if you don't know the answer just say it.")
 
 from html_design import loading_html
 # Define chatbot function
@@ -65,7 +63,7 @@ demo = gr.ChatInterface(
     fn=chat_with_bot,
     type="messages",
     textbox=gr.Textbox(
-        placeholder="Ask me a yes or no question",
+        placeholder="Ask me any travel-related question.",
         container=False,
         scale=7
     ),
