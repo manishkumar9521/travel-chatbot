@@ -20,32 +20,14 @@ base_llm = HuggingFaceEndpoint(
 llm = ChatHuggingFace(llm=base_llm)
 
 # 3. Define tools
-def calculator(expression: str):
-    try:
-        return str(numexpr.evaluate(expression))
-    except Exception as e:
-        return f"Error: {e}"
-
-calculator_tool = Tool.from_function(
-    func=calculator,
-    name="Calculator",
-    description="Calculate a mathematical expression. Input must be a valid mathematical expression string."
-)
-
-def get_weather(location):
-    return f"The weather in {location} is very cold with a temperature of 49°C."
-
-weather_tool = Tool(
-    name="Weather",
-    func=get_weather,
-    description="A tool that fetches the current weather for a given location."
-)
-
-tools = [calculator_tool, weather_tool]
+from tools_functions import calculator_tool, weather_tool, web_search
+tools = [calculator_tool, weather_tool, web_search]
 
 system_prompt = "You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
     "You also creates travel packages for the users. If needed you uses tools to answer questions and "\
-    "if you don't know the answer just say it. Don't say I don't have tools just answer in general way."
+    "if you don't know the answer just say it. "\
+    "If you need search engine to fetch a query, please use web_search tool"\
+    "If you don't have tool for a query, don't say I don't have tools just answer in general way."
 
 # 4. Create the prompt for the agent
 prompt = ChatPromptTemplate.from_messages([
@@ -115,6 +97,6 @@ demo = gr.ChatInterface(
     title="🧳 Travel Assistant Chatbot (LangChain + Agent Tools + Gradio)",
     description="Ask any question about the place where you want to visit.<br>Note: The weather tool, powered by Agentic AI, always reports 'very cold' with a temperature of 49°C.",
     theme="ocean",
-    examples=["Hello", "How is the weather in Meerut?", "Suggest me a picnic location near me", "What is 100 divided by 5 plus 2?"],
+    examples=["How is the weather in Meerut?", "Suggest me a picnic location near me", "What is 100 divided by 5 plus 2?"],
 )
 demo.launch()

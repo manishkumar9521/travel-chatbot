@@ -12,8 +12,12 @@ from tools_functions import calculator, get_weather
 tools = [calculator, get_weather]
 
 # 4. Create the prompt for the agent
+system_prompt = "You are a helpful, friendly travel assistant and who in a very short, concise and accurate manner. " \
+    "You also creates travel packages for the users. If needed you uses tools to answer questions and "\
+    "if you don't know the answer just say it. Don't say I don't have tools just answer in general way."
+
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant, if needed you uses tools to answer questions. If you don't knows the answer then say so."),
+    ("system", system_prompt),
     MessagesPlaceholder("chat_history", optional=True),
     ("human", "{input}"),
     MessagesPlaceholder("agent_scratchpad"),
